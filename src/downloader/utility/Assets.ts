@@ -1,0 +1,1 @@
+export const GetAssets = (Path: string) => new URL(Path, self.location.origin).toString()

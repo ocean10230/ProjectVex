@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://esm.sh;">
+</head>
+<body>
+<script type="module">
+    window.addEventListener("message", async e => {
+        let iframe_port = e.ports[0]
+        const code = e.data
+        const logs = []
+        let url
+        
+        try {
+            const log = (...args) => logs.push(args.join(" "))
+            
+            console.log = log
+            console.warn = log
+            console.error = log
+
+            const blob = new Blob([code], {type: 'text/javascript'})
+            url = URL.createObjectURL(blob)
+            await import(url)
+        } finally {
+            URL.revokeObjectURL(url)
+            iframe_port.postMessage(logs.join("\n"))
+        }
+    });
+</script>
+</body>
+</html>

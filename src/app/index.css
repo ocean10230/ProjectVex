@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@custom-variant compact (body.compact &);
+@custom-variant light (body[theme="light"] &);
+
+@theme {
+    --color-primary: #FF0000;
+    --color-secondary: #ff2f55;
+    --color-grad: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    --color-bg: #0D0D0D;
+    --color-bg2: #111111;
+    --color-s: #111;
+    --color-s1: #1a1a1a;
+    --color-s2: #1E1E1E;
+    --color-border: #272727;
+    --color-text: #F2F2F2;
+    --color-muted: #7A7A7A;
+
+    --color-accent-text: #fff;
+}
+
+@utility transform {
+    @apply duration-350;
+    transition-property: color, background, background-color, margin, margin-top, margin-bottom, margin-left, margin-right, transform, translate, gap, width, padding, padding-left, padding-right, padding-top, padding-bottom;
+}
+
+body[theme="light"] {
+    --color-bg: #fff;
+    --color-bg2: #fafafa;
+    --color-s: #f8f8f8;
+    --color-s1: #ececec;
+    --color-s2: #fafafa;
+    --color-border: #dadada;
+    --color-text: #000;
+    --color-muted: #8f8f8f;
+    --color-grad: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+
+body[color="red"] {
+    --color-primary: #e02a2a;
+    --color-secondary: #ee356c;
+}
+
+body[color="orange"] {
+    --color-primary: #f0571b;
+    --color-secondary: #f1a145;
+}
+
+body[color="yellow"] {
+    --color-primary: #ffb224;
+    --color-secondary: #ffc524;
+    --color-accent-text: #000
+}
+
+body[color="green"] {
+    --color-primary: #55a346;
+    --color-secondary: #25da25;
+}
+
+body[color="blue"] {
+    --color-primary: #2597e4;
+    --color-secondary: #1698f0;
+}
+
+
+body[color="indigo"] {
+    --color-primary: #6163f7;
+    --color-secondary: #5c75e4;
+}
+
+body[color="violet"] {
+    --color-primary: #7762d6;
+    --color-secondary: #4841a7;
+}
+
+body[color="pink"] {
+    --color-primary: #d340c7;
+    --color-secondary: #e636d7;
+}
+
+
+body {
+    @apply flex justify-end text-[16px]
+}
+
+@layer base {
+    *::-webkit-scrollbar {
+        @apply w-1.25 bg-s1;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        @apply transition-colors bg-linear-to-b from-primary/80 to-secondary/70 rounded-full;
+    }
+
+    button:not([role="switch"]) {
+        @apply flex items-center gap-2 p-1.5
+        px-3 rounded-lg justify-center not-disabled:cursor-pointer
+        text-[14px] bg-linear-135 from-s2 to-s2
+        hover:from-s1 hover:to-s1 not-disabled:hover:text-text/90
+        border border-border/50 hover:border-border/30 disabled:opacity-50;
+    }
+
+    button.accent {
+        @apply text-accent-text not-disabled:text-accent-text/90 not-disabled:hover:text-accent-text/90  border-none bg-linear-135 from-primary to-secondary hover:from-primary hover:to-secondary 
+    }
+
+    header button {
+        @apply text-muted hover:text-text transition-colors duration-200 p-1 size-7 flex items-center justify-center rounded-sm;
+    }
+
+    header button svg {
+        @apply shrink-0
+    }
+}

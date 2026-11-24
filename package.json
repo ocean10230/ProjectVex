@@ -1,0 +1,32 @@
+{
+  "name": "Grabify",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ffmpeg/core": "^0.12.10",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/chrome": "^0.3.6",
+    "framer-motion": "^14.9.0",
+    "lucide-react": "^1.66.0",
+    "preact": "^10.29.8",
+    "pyodide": "^0.27.7",
+    "react-hot-toast": "^2.6.1",
+    "react-router-dom": "^7.18.5",
+    "tailwindcss": "^4.3.3",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^24.19.2",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4"
+  }
+}
