@@ -12,7 +12,7 @@ export default function Header() {
     return <header className="shrink-0 bg-bg2 flex items-center justify-between p-3 border-b border-border">
         <div className="flex items-center gap-2 font-semibold">
             <Logo />
-            ProjectVex
+            Grabify
         </div>
 
         <div className="flex items-center gap-1">
