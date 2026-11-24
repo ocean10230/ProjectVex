@@ -132,7 +132,7 @@ export function VideoDownloading() {
                             <span className="text-muted/40 shrink-0 select-none">
                                 {new Date(log.time).toTimeString().slice(0, 8)}
                             </span>
-                            <span className="text-muted/80 break-all">
+                            <span className="text-muted/80 break-all wrap-break-word">
                                 {log.text}
                             </span>
                         </div>

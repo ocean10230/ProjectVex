@@ -31,6 +31,7 @@ let Runtime: PyodideInterface
 let Request: MessagePort
 
 const GetWheel = async (name: string) => {
+    Debug.Log("Loading library " + name)
     const Response = await fetch(`https://pypi.org/pypi/${name}/json`)
     const Data = await Response.json()
     const Library = Data.urls.find((file: { url: string, packagetype: string }) => file.packagetype === "bdist_wheel")
@@ -53,7 +54,7 @@ const Receive = (event: MessageEvent<any>) => {
         case Messages.SandboxResult:
             Evaluation.Resolve(message.result)
             break
-        case "DownloadFormat":
+        case Messages.DownloadVideo:
             Format.Resolve(message.format)
             break
     }
@@ -73,16 +74,19 @@ async function MainWorker() {
 
     const PatchSSL = async () => {
         pyodide.FS.mkdirTree("/usr/lib")
-        await Promise.all(["libcrypto.so", "libssl.so"].map(async f => pyodide.FS.writeFile(`/usr/lib/${f}`, new Uint8Array(await (await fetch(GetAssets(`libs/pyodide/openssl-1.1.1w/${f}`))).arrayBuffer()))))
+        Debug.Log("Loading cryptography libraries...")
+        await Promise.all(["libcrypto.so", "libssl.so"].map(async f => pyodide.FS.writeFile(`/usr/lib/${f}`, new Uint8Array(await (await fetch(GetAssets(`/libs/pyodide/openssl-1.1.1w/${f}`))).arrayBuffer()))))
         await pyodide.loadPackage(GetAssets(`/libs/pyodide/ssl-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl`))
     }
 
     const PatchHTTP = async () => {
         pyodide.FS.mkdirTree("/lib/python3.12/site-packages/pyodide_http_fork")
+        Debug.Log("Loading HTTP Proxy client...")
         await Promise.all(["__init__.py", "_core.py", "_requests.py", "_streaming.py", "_urllib.py"].map(async f => pyodide.FS.writeFile(`/lib/python3.12/site-packages/pyodide_http_fork/${f}`, await (await fetch(GetAssets(`/libs/pyodide_http_fork/pyodide_http/${f}`))).text())))
     }
 
     await Promise.all([ PatchSSL(), PatchHTTP(), pyodide.loadPackage(await Promise.all([ GetWheel('yt-dlp'), GetWheel('yt-dlp-ytse') ])) ])
+    Debug.Log("Fully initialized python runtime")
 
     pyodide.globals.set("url", await Download.Promise)
     pyodide.globals.set("output_folder", General.OutputFolder)
@@ -115,7 +119,7 @@ onmessage = event => {
         Request.onmessage = Receive
 
         Debug.SetLoggingPort(Request)
-        Debug.Log("Intiailizing")
+        Debug.Log("Intiailizing download worker...")
         
         self.spawn_worker = spawn_worker
         self.ffmpegbridge = ffmpegbridge

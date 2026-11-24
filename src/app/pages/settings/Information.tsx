@@ -9,7 +9,6 @@ export function About() {
             <hr className="text-muted/20 my-3" />
 
             <div className="flex flex-col gap-4">
-                {/* identity */}
                 <div className="flex items-center gap-3">
                     <div className="size-8 rounded-lg bg-linear-135 from-primary to-secondary flex items-center justify-center shrink-0">
                         <PlayIcon className="fill-white size-4" />
@@ -45,9 +44,8 @@ export function About() {
 
                 <hr className="text-muted/20" />
 
-                {/* legal */}
                 <p className="text-xs text-muted/50 leading-4">
-                    Grabify is a separated project. Not affiliated with Youtube or Google LLC
+                    ProjectVex is a separated project. Not affiliated with Youtube or Google LLC
                 </p>
             </div>
         </div>
