@@ -21,6 +21,7 @@ import type { PyodideInterface } from 'pyodide'
 import { Debugger } from '@/downloader/helper/Debug'
 import { GetAssets } from '@/downloader/utility/Assets'
 import { General, Messages } from '@/Config'
+import axios from 'axios'
 
 const Debug = new Debugger("Worker")
 let Download = promise_init<string>()
@@ -32,9 +33,8 @@ let Request: MessagePort
 
 const GetWheel = async (name: string) => {
     Debug.Log("Loading library " + name)
-    const Response = await fetch(`https://pypi.org/pypi/${name}/json`)
-    const Data = await Response.json()
-    const Library = Data.urls.find((file: { url: string, packagetype: string }) => file.packagetype === "bdist_wheel")
+    const Response = await axios.get(`https://pypi.org/pypi/${name}/json`)
+    const Library = Response.data.urls.find((file: { url: string, packagetype: string }) => file.packagetype === "bdist_wheel")
     return Library.url
 }
 

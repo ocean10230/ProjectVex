@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Clock, Trash2 } from 'lucide-react'
-import { UseHistory } from '@/app/manager/downloads/DownloadHistory'
-import Dropdown from '@/app/components/ui/Dropdown'
+import { UseHistory } from 'hooks/downloads/DownloadHistory'
+import Dropdown from 'components/ui/Dropdown'
 
 function TimeAgo(timestamp: number | string): string {
     const ms = typeof timestamp === "number" ? timestamp : Date.parse(timestamp)

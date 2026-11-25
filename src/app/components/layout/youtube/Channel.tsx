@@ -1,6 +1,7 @@
 export default function Channel({
     channel
 }: { channel?: Channel  }) {
+
     return (
         <div className="flex items-center justify-between p-3 rounded-xl bg-bg2 border border-border">
             <div className="flex items-center gap-2">
@@ -19,11 +20,10 @@ export default function Channel({
                                 compactDisplay: 'short',
                                 maximumFractionDigits: 0
                             }).format(channel?.statistics.subscriberCount || 0)
-                        } subscribers</p>
+                        } subscribers
+                    </p>
                 </div>
             </div>
-
-            <button onClick={() => window.open("https://youtube.com/" + channel?.snippet.customUrl)}>Subscribe</button>
         </div>
     )
 }

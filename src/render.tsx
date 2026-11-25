@@ -1,13 +1,19 @@
-import { render } from 'preact'
-import { General, Messages } from '@/Config'
+import 'preact/debug'
+import 'preact/devtools'
 
-import { VideoData, YoutubeURL } from '@/app/manager/utilities/VideoData'
-import { DebugContext } from '@/app/manager/utilities/Debugs'
-import ThemeContext from '@/app/manager/themes/Display'
-import { App } from '@/app/App'
-import '@/app/index.css'
-import Notify from './app/components/Notify'
+import { render } from 'preact'
 import { X } from 'lucide-react'
+
+import { VideoData } from 'hooks/utilities/VideoData'
+import { DebugContext } from 'hooks/utilities/Debugs'
+import ThemeContext from 'hooks/themes/Display'
+
+import { App } from '@/app/App'
+import Notify from 'components/Notify'
+
+import { General, Messages } from '@/Config'
+import '@/app/index.css'
+
 
 render(<App />, document.getElementById('app')!)
 let respond: MessagePort | undefined
@@ -113,11 +119,12 @@ window.addEventListener('message', event => {
         respond.addEventListener("message", (e) => {
             const message = e.data
             if (General.ShowLogs.Messages) console.log("Background->Frontend")
+            
             const updated = [...VideoData.getState().Qualities]
 
             switch (message.type) {
                 case Messages.VideoURL:
-                    YoutubeURL.getState().setURL(message.dlurl)
+                    VideoData.getState().setURL(message.dlurl)
                     if (General.ShowLogs.Frontend) console.info("[Frontend] received video URL")
                     break
 
@@ -224,11 +231,16 @@ window.addEventListener('message', event => {
         respond.start()
 
         respond.postMessage({
-            type: "IframePosition",
+            type: Messages.IframePosition,
             Position: ThemeContext.getState().Position,
         })
     }
-    else if (["DownloadFormat", "Context.Position", "ClosePopup", "StopDownload"].includes(event.data.type)) {
+    else if ([
+        Messages.DownloadVideo,
+        Messages.IframePosition,
+        Messages.ClosePopup,
+        Messages.StopDownload
+    ].includes(event.data.type)) {
         respond?.postMessage(event.data)
     }
 })

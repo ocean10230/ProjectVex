@@ -3,8 +3,8 @@ import { useLocation, Outlet } from "react-router-dom"
 import { AnimatePresence } from "framer-motion"
 import { Download, Info, Palette, PersonStanding, type LucideIcon } from "lucide-react"
 
-import { SettingTab } from "@/app/components/ui/pages/SettingTab"
-import ColorContext from "@/app/manager/themes/Display"
+import { SettingTab } from "components/ui/pages/SettingTab"
+import ColorContext from "hooks/themes/Display"
 
 type RouteItem = [LucideIcon, string, string];
 

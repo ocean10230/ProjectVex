@@ -30,7 +30,7 @@ export function QualitySelectorItem({
 
             onClick={onSelect}
             className={`flex items-center justify-between p-2 px-3.25 rounded-xl border shrink-0 cursor-pointer transition-colors duration-200 ${
-                selected ? "bg-primary/20 border-primary/20" : "bg-s border-s1 hover:border-border hover:bg-s2"
+                selected ? "bg-primary/20 border-primary/20" : "bg-s border-s1 hover:border-border hover:bg-s2/40"
             }`}
         >
             <div className="leading-4">

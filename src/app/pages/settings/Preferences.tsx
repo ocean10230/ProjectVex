@@ -1,10 +1,11 @@
-import Switch from "@/app/components/ui/Switch"
-import CustomDropdown from "@/app/components/ui/Dropdown"
+import Switch from "components/ui/Switch"
+import PreferenceContext from "hooks/preferences/Youtube"
 
 export function Preference() {
+    const Settings = PreferenceContext()
+
     return (
         <div className="leading-4 h-full">
-
             <p className="font-medium">Preference</p>
             <p className="text-sm text-muted">Functionality adjustment</p>
 
@@ -21,15 +22,16 @@ export function Preference() {
                     </div>
 
                     <div className="flex gap-1 items-center">
-                        <CustomDropdown
-                            options={[ "oEmbeded", "Youtube API V3" ]}
-                            value="oEmbeded"
-                        />
 
-                        <input type="text" placeholder="Youtube API key (v3)" className="p-1 px-2 bg-s2 border outline-none border-muted/50 focus-within:border-primary rounded-lg text-sm font-normal" />
+                        <input
+                            type="password"
+                            value={Settings.YoutubeApiKey}
+                            onInput={(e) => Settings.SetYoutubeApiKey((e.target as HTMLInputElement).value)}
+                            placeholder="Youtube API key (v3)"
+                            className="p-1 px-2 bg-s2 border outline-none border-muted/50 focus-within:border-primary rounded-lg text-sm font-normal disabled:opacity-40"
+                        />
                     </div>
                 </div>
-
 
                 <div className="w-full justify-between flex items-center text-sm font-medium">
                     <div className="flex flex-col leading-3.5">
@@ -38,7 +40,10 @@ export function Preference() {
                             Automatically downloads without extra selection (pre-set format)
                         </p>
                     </div>
-                    <Switch/>
+                    <Switch
+                        Checked={Settings.AutoDownload}
+                        OnChecked={(v) => Settings.SetAutoDownload(v)}
+                    />
                 </div>
 
                 <div className="w-full justify-between flex items-center text-sm font-medium">
@@ -48,7 +53,10 @@ export function Preference() {
                             Ask to confirm the downloaded video & format to prevent unneccessary waste of resources
                         </p>
                     </div>
-                    <Switch/>
+                    <Switch
+                        Checked={Settings.Confirmation}
+                        OnChecked={(v) => Settings.SetConfirmation(v)}
+                    />
                 </div>
 
                 <div className="w-full justify-between flex items-center text-sm font-medium">
@@ -58,7 +66,10 @@ export function Preference() {
                             Close this pop-up after done downloading
                         </p>
                     </div>
-                    <Switch/>
+                    <Switch
+                        Checked={Settings.CloseOnCompletion}
+                        OnChecked={(v) => Settings.SetCloseOnCompletion(v)}
+                    />
                 </div>
 
                 <div className="w-full justify-between flex items-center text-sm font-medium">
@@ -68,7 +79,10 @@ export function Preference() {
                             Uses a skeleton block to represent a loading item instead of a loading screen
                         </p>
                     </div>
-                    <Switch/>
+                    <Switch
+                        Checked={Settings.StaticPlaceholders}
+                        OnChecked={(v) => Settings.SetStaticPlaceholders(v)}
+                    />
                 </div>
             </div>
         </div>

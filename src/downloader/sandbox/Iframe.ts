@@ -31,7 +31,7 @@ function content_port_onmessage(event: MessageEvent<any>) {
             break
         case Messages.StopDownload:
             worker.terminate()
-            respond.postMessage({ type: "ClosePopup" })
+            respond.postMessage({ type: Messages.ClosePopup })
             break
     }
 }
@@ -95,8 +95,10 @@ function WorkerMessageHandler(event: MessageEvent<any>) {
 }
 
 async function main() {
-    worker = new Worker("/scripts/worker.js", { type: "module" })
+    console.log("idk", chrome)
     const worker_channel = new MessageChannel()
+
+    worker = new Worker("/scripts/worker.js", { type: "module" })
     worker_port = worker_channel.port1
     worker_port.onmessage = WorkerMessageHandler
     

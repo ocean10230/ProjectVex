@@ -7,9 +7,9 @@ export default function Notify(message: string, Icon?: LucideIcon) {
     const isSuccess = Icon === Check
 
     const borderColor = isError 
-        ? "border-red-500/50 bg-red-400/50" 
+        ? "border-red-500/30 bg-red-400/30" 
         : isSuccess 
-            ? "border-green-400/50 bg-green-400/50" 
+            ? "border-green-400/30 bg-green-400/30" 
             : "border-border/50 bg-s2"
 
     toast.custom(
@@ -17,7 +17,7 @@ export default function Notify(message: string, Icon?: LucideIcon) {
             <AnimatePresence>
                 {t.visible && (
                     <motion.div 
-                        className={`flex items-center gap-2 p-2.25 border ${borderColor} rounded-xl shadow-lg`}
+                        className={`backdrop-blur-xl flex items-center gap-2 p-2.25 border ${borderColor} rounded-xl shadow-lg`}
                         initial={{ x: 50, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: 50, opacity: 0 }}

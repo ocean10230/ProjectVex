@@ -3,23 +3,20 @@
   "name": "ProjectVex",
   "description": "A simple Youtube videos downloader",
   "version": "1.0.0",
+  "version_name": "1.0.0",
   "action": {},
   
-  "cross_origin_embedder_policy": {
-    "value": "require-corp"
-  },
-  "cross_origin_opener_policy": {
-    "value": "same-origin"
-  },
   "icons":{"16":"icon.png","32":"icon.png","48":"icon.png","128":"icon.png"},
   "permissions": [
     "scripting",
     "storage"
   ],
+
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';",
     "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://esm.sh;"
   },
+
   "web_accessible_resources": [
     {
       "resources": [
@@ -30,15 +27,20 @@
       ]
     }
   ],
-  "content_scripts":[{"matches":["*://*.googleapis.com/*"],"js":["libs/AntiCORS.js"],"run_at":"document_idle","all_frames":true}],
+
+  "content_scripts":[{"matches":["*://*.googleapis.com/*","*://*.youtube.com/*"],"js":["libs/AntiCORS.js"],"run_at":"document_idle","all_frames":true}],
+  
   "background": {
     "service_worker": "scripts/script.js",
     "type": "module"
   },
+
   "host_permissions": [
-    "*://*/*"
+    "*://*/*",
+    "*://*.youtube.com/*"
   ],
-    "sandbox": {
+
+  "sandbox": { 
     "pages": ["sandbox.html"]
   }
 }

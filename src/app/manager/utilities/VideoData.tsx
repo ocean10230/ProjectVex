@@ -3,6 +3,10 @@ import { create } from 'zustand'
 export type VideoInfoStatus = "idle" | "loading" | "success" | "error"
 
 export interface StateManager {
+    url?: string
+    setURL: (data: string) => void
+    clearURL: () => void
+
     video?: YoutubeVideoInfo
     channel?: Channel
     Qualities: Array<AudioQuality | VideoQuality>
@@ -50,16 +54,8 @@ export const VideoData = create<StateManager>()((set) => ({
         videoInfoError: error
     }),
 
-    setDownloadedQualityID: (selected_media) => set(prev => ({ ...prev, selected_media }))
-}))
+    setDownloadedQualityID: (selected_media) => set(prev => ({ ...prev, selected_media })),
 
-interface URLManager {
-    url?: string
-    setURL: (data: string) => void
-    clearURL: () => void
-}
-
-export const YoutubeURL = create<URLManager>()((set) => ({
     url: undefined,
     setURL: (data: string) => set({ url: data }),
     clearURL: () => set({ url: undefined }),

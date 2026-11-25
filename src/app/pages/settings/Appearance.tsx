@@ -1,6 +1,6 @@
-import Switch from "@/app/components/ui/Switch"
-import CustomDropdown from "@/app/components/ui/Dropdown"
-import ThemeContext from "@/app/manager/themes/Display"
+import Switch from "components/ui/Switch"
+import CustomDropdown from "components/ui/Dropdown"
+import ThemeContext from "hooks/themes/Display"
 
 const Colors: Array<[ColorType, string]> = [
     ["red", "bg-red-500"],
@@ -36,9 +36,12 @@ export function Appearance() {
 
     return (
         <div className="leading-4 h-full">
-            <p className="font-medium">Appearance</p>
-            <p className="text-sm text-muted">Themes & visual preferences</p>
-
+            {
+                Context.Compacted && <>
+                    <p className="font-medium">Appearance</p>
+                    <p className="text-sm text-muted">Themes & visual preferences</p>
+                </>
+            }
             <hr className="text-muted/20 my-3 compact:my-2" />
 
             <div className="flex flex-col compact:gap-1.5 gap-3">
@@ -104,7 +107,7 @@ export function Appearance() {
                                 onClick={() => Context.SetPosition(pos)}
                                 className={[
                                     "rounded-none w-full h-3 cursor-pointer transition-colors border",
-                                    Context.Position === pos ? "bg-primary border-transparent" : "bg-s2 hover:bg-s1 border-transparent hover:border-primary",
+                                    Context.Position === pos ? "bg-primary border-transparent" : "not-light:bg-s2 not-light:hover:bg-s1 bg-s1 hover:bg-s2 border-transparent hover:border-primary",
                                     i === 0 && "rounded-tl-md",
                                     i === 2 && "rounded-tr-md",
                                     i === 6 && "rounded-bl-md",

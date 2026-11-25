@@ -51,7 +51,7 @@ const start = async () => {
     if (!location.hostname.includes("youtube.com")) return alert("This extension is specialized to download videos from Youtube, other platforms that are not focused won't be able to be downloaded")
     console.clear()
 
-    const old = document.getElementById("ProjectVexContainer")
+    const old = document.getElementById("YT-DLP_ProjectVexContainer")
     if (old) old.remove()
 
     const container = document.createElement("div")
@@ -59,7 +59,7 @@ const start = async () => {
 
     let currentPosition: Position = "tr"
 
-    container.id = "ProjectVexContainer"
+    container.id = "YT-DLP_Container"
     Object.assign(container.style, {
         position: "fixed",
         top: "0px",
@@ -79,7 +79,6 @@ const start = async () => {
         border: "none",
     })
 
-    // Keep container aligned to the chosen anchor if the browser window is resized
     const onResize = () => tweenContainerPosition(container, currentPosition, true)
     window.addEventListener("resize", onResize)
 
@@ -91,9 +90,7 @@ const start = async () => {
 
         iframe.contentWindow?.postMessage("content_init", "*", [iframe_channel.port2, proxy.port2])
         proxy.port1.onmessage = (e) =>
-            Fetch(e.data.request).then((result) =>
-                iframe_port.postMessage({ type: Messages.ProxyResult, response: result }, [result.body])
-            )
+            Fetch(e.data.request).then((result) => iframe_port.postMessage({ type: Messages.ProxyResult, response: result }, [result.body]))
 
         iframe_port.onmessage = (e) => {
             const message = e.data
@@ -130,7 +127,10 @@ const start = async () => {
                 }
                 case Messages.ClosePopup:
                     container.style.opacity = "0"
-                    setTimeout(iframe.remove, 500)
+                    setTimeout(() => {
+                        iframe.remove()
+                        container.remove()
+                    }, 750)
                     break
             }
         }

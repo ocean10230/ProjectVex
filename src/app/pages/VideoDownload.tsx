@@ -1,20 +1,23 @@
 import { XCircle, Loader2, Check, CircleX } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
-import { FormatBytes } from '@/app/functions/Format'
+import { FormatBytes } from 'functions/Format'
 
-import { VideoData } from '@/app/manager/utilities/VideoData'
-import { DebugContext } from '@/app/manager/utilities/Debugs'
-import { UseHistory } from '@/app/manager/downloads/DownloadHistory'
-import { VideoPreviewCard } from '@/app/components/layout/youtube/VideoPreviewCard'
+import { VideoData } from 'hooks/utilities/VideoData'
+import { DebugContext } from 'hooks/utilities/Debugs'
+import { UseHistory } from 'hooks/downloads/DownloadHistory'
+
+import VideoPreviewCard from 'components/layout/youtube/VideoPreviewCard'
+
+import { Messages } from '@/Config'
 
 const handleReturnClick = () => {
     const { Status } = DebugContext.getState()
 
     if (Status === 2) {
-        window.postMessage({ type: "ClosePopup" }, "*")
+        window.postMessage({ type: Messages.ClosePopup }, "*")
     } else {
-        window.postMessage({ type: "StopDownload" }, "*")
+        window.postMessage({ type: Messages.StopDownload }, "*")
     }
 }
 
@@ -74,21 +77,24 @@ export function VideoDownloading() {
                     <VideoPreviewCard video={video} />
 
                     {/* current action */}
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bg2 border border-border text-xs">
-                        {logs.Status === 2 ? (
-                            <Check className="size-3.5 text-green-500 shrink-0" />
-                        ) : (
-                            <Loader2 className="size-3.5 text-primary animate-spin shrink-0" />
-                        )}
-                        <span className="truncate">
-                            {logs.Status === 2 ? "Finished" : logs.Processing || "Preparing download..."}
-                        </span>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-bg2 border border-border text-xs">
+                        
+                        <div className="flex items-center gap-2">
+                            { logs.Status === 2 ? (
+                                <Check className="size-3.5 text-green-500 shrink-0" />
+                            ) : (
+                                <Loader2 className="size-3.5 text-primary animate-spin shrink-0" />
+                            )}
+
+                            <p className="truncate">{logs.Status === 2 ? "Finished" : logs.Processing || "Preparing download..."}</p>
+                            
+                        </div>
                     </div>
 
                     {/* progress */}
                     <div className="flex flex-col gap-2 p-3 rounded-xl bg-bg2 border border-border w-full min-w-0">
                         <div className="flex items-center justify-between text-xs font-medium">
-                            <span>{downloadedMB}/{num} MB <span className="text-muted/50">({logs.Speed || "0 B/s"})</span></span>
+                            <span>{downloadedMB}/{num} MB</span>
                             <span className="text-primary">{(logs.Progress || 0).toFixed(0)}%</span>
                         </div>
 
@@ -102,7 +108,7 @@ export function VideoDownloading() {
                 </div>
 
                 <button
-                    className="mb-1 accent"
+                    className="my-0.5 accent"
                     disabled={logs.Processing.toLowerCase().includes("merging") && logs.Status !== 2}
                     onClick={handleReturnClick}
                 >
@@ -137,6 +143,12 @@ export function VideoDownloading() {
                             </span>
                         </div>
                     ))}
+
+                    {logs.Processing.includes("Download") && 
+                        <div className="flex items-start gap-2 text-xs px-1.5 py-1 rounded-md hover:bg-s1 transition-colors">
+                            Download status: {logs.Speed || "0 B/s"}
+                        </div>}
+                    
                     
                     <div ref={logEndRef} />
                 </div>

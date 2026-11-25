@@ -2,15 +2,17 @@ import { Video, AudioLines, Download, XCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { FormatBytes } from 'functions/Format'
 
-import { FormatBytes } from '@/app/functions/Format'
+import QualitySelectorItem from 'components/ui/pages/QualitySelectorItem'
+import Channel from 'components/layout/youtube/Channel'
+import VideoPreviewCard from 'components/layout/youtube/VideoPreviewCard'
 
-import QualitySelectorItem from '@/app/components/ui/pages/QualitySelectorItem'
-import Channel from '@/app/components/layout/youtube/Channel'
-import { VideoPreviewCard } from '@/app/components/layout/youtube/VideoPreviewCard'
+import { VideoData } from 'hooks/utilities/VideoData'
+import Preferences from 'hooks/preferences/Youtube'
 
-import { VideoData, YoutubeURL } from '@/app/manager/utilities/VideoData'
 import { General } from '@/Config'
+import FetchVideoInfo from 'functions/FetchVideoInfo'
 
 const types = [
     "rounded-none justify-center flex-1 flex items-center gap-2 px-2 p-1 bg-linear-135 from-primary to-secondary text-accent-text",
@@ -55,18 +57,30 @@ export function FileTypeTabs({ type, onChange }: FileTypeTabsProps) {
 
 export function DownloadSidebar({ type, setType }: { type: FileType; setType: (t: FileType) => void }) {
     const qualities = VideoData((state) => state.Qualities)
+    const defaultQuality = Preferences((state) => state.DefaultQuality)
     const data = VideoData()
     
     const [selectedVideoId, setSelectedVideoId] = useState<string>("")
     const [selectedAudioId, setSelectedAudioId] = useState<string>("")
 
-    const videoQualities = qualities.filter((q): q is VideoQuality => q.type === "video")
-    const audioQualities = qualities.filter((q): q is AudioQuality => q.type === "audio")
+    const videoQualities = qualities
+        .filter((q): q is VideoQuality => q.type === "video" && q.resolution <= 1080 && q.size <= Math.pow(2, 32))
+        .sort((a, b) => b.resolution - a.resolution)
+
+    const audioQualities = qualities
+        .filter((q): q is AudioQuality => q.type === "audio" && q.size <= Math.pow(2, 32))
+        .sort((a, b) => b.bitrate - a.bitrate)
 
     useEffect(() => {
-        if (videoQualities.length > 0 && !videoQualities.some(q => q.id === selectedVideoId)) setSelectedVideoId(videoQualities[0].id)
-        if (audioQualities.length > 0 && !audioQualities.some(q => q.id === selectedAudioId)) setSelectedAudioId(audioQualities[0].id)
-    }, [qualities])
+        if (videoQualities.length > 0 && !videoQualities.some(q => q.id === selectedVideoId)) {
+            const pick = defaultQuality === "Lightest" ? videoQualities[videoQualities.length - 1] : videoQualities[0]
+            setSelectedVideoId(pick.id)
+        }
+        if (audioQualities.length > 0 && !audioQualities.some(q => q.id === selectedAudioId)) {
+            const pick = defaultQuality === "Lightest" ? audioQualities[audioQualities.length - 1] : audioQualities[0]
+            setSelectedAudioId(pick.id)
+        }
+    }, [qualities, defaultQuality])
 
     const currentQualities = type === "video" ? videoQualities : audioQualities
     const currentSelection = type === "video" ? selectedVideoId : selectedAudioId
@@ -85,7 +99,7 @@ export function DownloadSidebar({ type, setType }: { type: FileType; setType: (t
         data.setSelectionId(currentSelection)
     }, [type, currentSelection])
 
-    useEffect(() => {General.ShowLogs.Frontend && console.log(data.selected_media)}, [data.selected_media])
+    useEffect(() => { General.ShowLogs.Frontend && console.log(data.selected_media) }, [data.selected_media])
 
     return (
         <div className="flex flex-col w-40/100 shrink-0 bg-bg2 h-full border-r border-border overflow-hidden">
@@ -94,43 +108,32 @@ export function DownloadSidebar({ type, setType }: { type: FileType; setType: (t
 
                 <div className="flex flex-col gap-1 mt-2 overflow-y-auto pr-1 flex-1 min-h-0">
                     <AnimatePresence mode="wait">
-                        {currentQualities.length < 1 ? <>
-                        
-                            <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution=''  />
-                            <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution=''  />
-                            <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution=''  />
-                            <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution=''  />
-                        
-                        </> : [...currentQualities].sort((a, b) => (
-                            b.type === "audio" && a.type === "audio"
-                            ? b.bitrate - a.bitrate :
-                            (
-                                b.type === "video" && a.type === "video"
-                                ? b.resolution - a.resolution
-                                : b.size - a.size
-                            )
-                        )).map((item) => {
+                        {currentQualities.length < 1 ? (
+                            <>
+                                <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution='' />
+                                <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution='' />
+                                <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution='' />
+                                <QualitySelectorItem onSelect={() => {}} isSkeleton={true} detail='' selected={false} resolution='' />
+                            </>
+                        ) : (
+                            currentQualities.map((item) => {
+                                const label = item.type === "video" ? item.resolution + "p" : `${Math.round(item.bitrate)} kbps`
+                                const bytes = FormatBytes(item.size)
 
-                        if (item.type === "video" && item.resolution > 1080) return
-                        if (item.size > Math.pow(2,32)) return
+                                if (bytes === "N/A") return null
+                                const detail = `${item.extension.toUpperCase()} • ${bytes}`
 
-                        const label = item.type === "video" ? item.resolution + "p" : `${Math.round(item.bitrate)} kbps`
-                        const bytes = FormatBytes(item.size)
-
-                        if (bytes === "N/A") return null
-                        const detail = `${item.extension.toUpperCase()} • ${bytes}`
-
-                        return (
-                            <QualitySelectorItem
-                                key={item.id}
-                                resolution={label}
-                                detail={detail}
-                                selected={currentSelection === item.id}
-                                onSelect={() => handleSelect(item.id)}
-                            />
-                        )
-
-                        })} 
+                                return (
+                                    <QualitySelectorItem
+                                        key={item.id}
+                                        resolution={label}
+                                        detail={detail}
+                                        selected={currentSelection === item.id}
+                                        onSelect={() => handleSelect(item.id)}
+                                    />
+                                )
+                            })
+                        )}
                     </AnimatePresence>
                 </div>
 
@@ -147,15 +150,6 @@ export function DownloadSidebar({ type, setType }: { type: FileType; setType: (t
     )
 }
 
-export function RightPanelFooter() {
-    return (
-        <div className="flex items-center justify-between gap-2 p-3 bg-bg2 border-t border-border shrink-0">
-            <p className="font-medium text-xs text-muted">VEx</p>
-            <p className="font-medium text-xs text-muted">Preact</p>
-        </div>
-    )
-}
-
 export function RightPanel() {
     const { video, channel } = VideoData()
 
@@ -165,17 +159,20 @@ export function RightPanel() {
                 <VideoPreviewCard video={video} />
                 <Channel channel={channel} />
             </div>
-
-            <RightPanelFooter />
         </div>
     )
 }
 
 export function Main() {
-    const [type, setType] = useState<FileType>('video')
-    const fetchStatus = VideoData(state => state.videoInfoStatus)
-    const fetchError = VideoData(state => state.videoInfoError)
-    const url = YoutubeURL(state => state.url)
+    const { DefaultFormat, StaticPlaceholders } = Preferences()
+    const { url, channel, videoInfoStatus, videoInfoError } = VideoData()
+    const [type, setType] = useState<FileType>(DefaultFormat)
+
+    if (!channel)
+        FetchVideoInfo()
+
+    
+    useEffect(() => setType(DefaultFormat), [DefaultFormat])
 
     useEffect(() => {
         if (import.meta.env.MODE === "development") {
@@ -187,27 +184,27 @@ export function Main() {
         }
     }, [])
 
-    const isLoading = !url || fetchStatus === "idle" || fetchStatus === "loading"
+    const isLoading = !url || videoInfoStatus === "idle" || videoInfoStatus === "loading"
 
-    if (isLoading) {
+    if (isLoading && !StaticPlaceholders) {
         return (
             <div className="flex items-center justify-center flex-col gap-1 w-full h-full">
                 <div className="flex gap-2 items-center bg-linear-135 from-primary to-secondary text-transparent text-2xl font-semibold bg-clip-text">
                     <Loader2 className="size-8 animate-spin duration-500 text-primary" />
                     <p className="flex items-center gap-2">Loading content</p>
                 </div>
+
+                <p className="text-muted w-1/2 text-center leading-4">This should really take long unless something wrong happens</p>
             </div>
         )
     }
 
-    if (fetchStatus === "error") {
-        return (
-            <div className="flex items-center justify-center flex-col gap-1 w-full h-full">
-                <p className="flex items-center gap-2 text-red-500 text-2xl font-semibold"><XCircle /> Video fetch error</p>
-                <p className="w-1/2 text-center text-text/85">{fetchError || "Could not load information for this video."}</p>
-            </div>
-        )
-    }
+    if (videoInfoStatus === "error") 
+        return <div className="flex items-center justify-center flex-col gap-1 w-full h-full">
+            <p className="flex items-center gap-2 text-red-500 text-2xl font-semibold"><XCircle /> Video fetch error</p>
+            <p className="w-1/2 text-center text-text/85">{videoInfoError || "Could not load information for this video."}</p>
+        </div>
+    
 
     return (
         <div className="flex flex-1 overflow-hidden w-full h-screen">
