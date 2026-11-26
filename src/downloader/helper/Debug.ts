@@ -1,4 +1,4 @@
-import { General, Messages } from "@/Config"
+import { General, Messages } from "src/Config"
 
 export class Debugger {
     Name: string = "General"
@@ -13,9 +13,7 @@ export class Debugger {
 
     SetLoggingPort(LoggingPort: MessagePort) {
         this.MessagePort = LoggingPort
-        for (const text of this.queue) {
-            this.MessagePort.postMessage({ type: Messages.Console, text })
-        }
+        for (const text of this.queue) this.MessagePort.postMessage({ type: Messages.Console, text })
         this.queue = []
     }
 

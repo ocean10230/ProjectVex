@@ -24,16 +24,19 @@
     "noFallthroughCasesInSwitch": true,
 
     "paths": {
-      "@/*": [ "./src/*" ],
+      "src/*": [ "./src/*" ],
 
-      "components/*": [ "./src/app/components/*" ],
-      "functions/*": [ "./src/app/functions/*" ],
-      "hooks/*": [ "./src/app/manager/*" ],
-      "pages/*": [ "./src/app/pages/*" ],
+      "frontend/*": [ "./frontend/*" ],
+      "components/*": [ "./frontend/components/*" ],
+      "functions/*": [ "./frontend/functions/*" ],
+      "hooks/*": [ "./frontend/manager/*" ],
+      "pages/*": [ "./frontend/pages/*" ],
+      "validation/*": [ "./frontend/validation/*" ],
+      "motion/*": [ "./frontend/motion/*" ],
 
       "react": ["./node_modules/preact/compat/"],
       "react-dom": ["./node_modules/preact/compat/"]
     }
   },
-  "include": ["src", "types", "types/API.d.ts"]
+  "include": ["src", "types", "types/API.d.ts", "app"]
 }

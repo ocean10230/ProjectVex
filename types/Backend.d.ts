@@ -13,3 +13,5 @@ declare type VideoQuality = {
     id: string
     resolution: number
 }
+
+declare module "*.py"

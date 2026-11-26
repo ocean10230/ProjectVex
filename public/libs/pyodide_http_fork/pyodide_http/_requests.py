@@ -41,7 +41,7 @@ class PyodideHTTPAdapter(BaseAdapter):
                 pyodide_request.timeout = pyodide_request.timeout[0] or 0
         if not pyodide_request.timeout:
             pyodide_request.timeout = 0
-        pyodide_request.params = None  # this is done in preparing request now
+        pyodide_request.params = None  
         pyodide_request.headers = dict(request.headers)
         if request.body:
             pyodide_request.set_body(request.body)
@@ -58,23 +58,23 @@ class PyodideHTTPAdapter(BaseAdapter):
         import requests
 
         response = requests.Response()
-        # Fallback to None if there's no status_code, for whatever reason.
+        
         response.status_code = getattr(resp, "status_code", None)
-        # Make headers case-insensitive.
+        
         response.headers = CaseInsensitiveDict(resp.headers)
-        # Set encoding.
+        
         response.encoding = get_encoding_from_headers(response.headers)
         if isinstance(resp.body, IOBase):
-            # streaming response
+            
             response.raw = resp.body
         else:
-            # non-streaming response, make it look like a stream
+            
             response.raw = BytesIO(resp.body)
 
         def new_read(self, amt=None, decode_content=False, cache_content=False):
             return self.old_read(amt)
 
-        # make the response stream look like a urllib3 stream
+        
         response.raw.old_read = response.raw.read
         response.raw.read = new_read.__get__(response.raw, type(response.raw))
 

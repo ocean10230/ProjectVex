@@ -21,7 +21,7 @@ class FakeSock:
         return BytesIO(self.data)
 
 
-# fake socket that supports streaming
+
 class StreamSock:
     def __init__(self, header, body):
         self.stream = PrefixedReader(header, body)
@@ -30,11 +30,11 @@ class StreamSock:
         return self.stream
 
 
-# prepends a constant byte string to a dynamic stream and returns a new stream. this is to add the http headers to
-#  streams
+
+
 class PrefixedReader(io.RawIOBase):
     def __init__(self, prefix: bytes, reader: io.BufferedReader):
-        # keep a memoryview so we can slice off bytes without copying on each read
+        
         self._prefix = memoryview(prefix)
         self._reader = reader
 
@@ -42,11 +42,11 @@ class PrefixedReader(io.RawIOBase):
         return True
 
     def readinto(self, b: bytearray) -> int:
-        # chatgpt wrote this code, idfk
+        
         size = len(b)
         buf = bytearray()
 
-        # 1) Serve from prefix if any remains
+        
         if self._prefix is not None:
             if len(self._prefix) <= size:
                 buf += self._prefix.tobytes()
@@ -60,19 +60,19 @@ class PrefixedReader(io.RawIOBase):
                 buf += self._prefix[:size].tobytes()
                 self._prefix = self._prefix[size:]
         else:
-            # 2) No prefix left → drain straight from the reader
+            
             chunk = self._reader.read(size)
             if chunk:
                 buf += chunk
 
-        # copy into the supplied buffer and report how many bytes we wrote
+        
         b_view = memoryview(b)
         b_view[:len(buf)] = buf
         return len(buf)
 
 
 def urlopen(url, *args, **kwargs):
-    # print("URLOPEN CALLED")
+    
     method = "GET"
     data = None
     headers = {}
@@ -87,13 +87,13 @@ def urlopen(url, *args, **kwargs):
     resp = send(request)
     from js import console
     from pyodide.ffi import to_js
-    # print(resp)
+    
 
-    # Build a fake http response
-    # Strip out the content-length header. When Content-Encoding is 'gzip' (or other
-    # compressed format) the 'Content-Length' is the compressed length, while the
-    # data itself is uncompressed. This will cause problems while decoding our
-    # fake response.
+    
+    
+    
+    
+    
 
     """
     Ok so, pyodide_http reconstructs a raw HTTP response from the body that XHR returns. Problem is, XHR handles 
@@ -116,7 +116,7 @@ def urlopen(url, *args, **kwargs):
                 + b"\n\n"
         )
 
-        # wrap streaming array in fake socket
+        
         response = HTTPResponse(StreamSock(response_header, resp.body))
         response.url = url
         response.begin()
@@ -131,19 +131,19 @@ def urlopen(url, *args, **kwargs):
                 + b"\n\n"
                 + resp.body
         )
-        # print("PROXY:", response_data.decode())
+        
         response = HTTPResponse(FakeSock(response_data))
         response.url = url
         response.begin()
 
-    # patch
+    
     if isinstance(url, urllib.request.Request):
         response.url = url.full_url
     else:
         response.url = url
 
-    # urlopen actually throws an exception on http errors. i dont think yt-dlp cares, but this is "proper"
-    # wrote this as i was chasing down a different bug, but i think its more proper so it stays
+    
+    
     if not (200 <= response.status < 300):
         raise urllib.error.HTTPError(response.url, response.status, f"HTTP Error {response.status}", response.headers, None)
 
@@ -158,7 +158,7 @@ current_jar = None
 current_cookies = None
 
 
-# patch: add cookies
+
 class CookiePatch(urllib.request.HTTPCookieProcessor):
     def __init__(self, cookiejar):
         super().__init__(cookiejar)
@@ -172,7 +172,7 @@ def patch():
     if _IS_PATCHED:
         return
 
-    # cookie patch
+    
     urllib.request.HTTPCookieProcessor = CookiePatch
 
     urllib.request.urlopen = urlopen

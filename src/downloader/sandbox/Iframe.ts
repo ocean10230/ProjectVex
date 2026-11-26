@@ -1,6 +1,6 @@
-import { General, Messages } from '@/Config'
-import { Debugger } from "@/downloader/helper/Debug"
-import { DynamicPromise } from "@/downloader/utility/Promise"
+import { General, Messages } from 'src/Config'
+import { Debugger } from "src/downloader/helper/Debug"
+import { DynamicPromise } from "src/downloader/utility/Promise"
 
 let dlurl = DynamicPromise<string>()
 let worker: Worker
@@ -17,17 +17,13 @@ function content_port_onmessage(event: MessageEvent<any>) {
         console.debug("Background->IFrame", message)
     
     switch (event.data.type) {
-        case Messages.VideoURL:
-            dlurl.Resolve(message.dlurl)
-            break
         case Messages.ProxyResult:
-            worker_port.postMessage(message)
-            break
         case Messages.SandboxResult:
-            worker_port.postMessage(message)
-            break
         case Messages.DownloadVideo:
             worker_port.postMessage(message)
+            break
+        case Messages.VideoURL:
+            dlurl.Resolve(message.dlurl)
             break
         case Messages.StopDownload:
             worker.terminate()
@@ -95,14 +91,17 @@ function WorkerMessageHandler(event: MessageEvent<any>) {
 }
 
 async function main() {
-    console.log("idk", chrome)
     const worker_channel = new MessageChannel()
 
     worker = new Worker("/scripts/worker.js", { type: "module" })
     worker_port = worker_channel.port1
     worker_port.onmessage = WorkerMessageHandler
-    
+
     worker.postMessage(chrome.runtime.getURL("/"), [])
     worker.postMessage("init", [ worker_channel.port2 ])
-    worker_port.postMessage({ type: Messages.VideoURL, dlurl: await dlurl.Promise })
+
+    worker_port.postMessage({
+        type: Messages.VideoURL,
+        dlurl: await dlurl.Promise
+    })
 }

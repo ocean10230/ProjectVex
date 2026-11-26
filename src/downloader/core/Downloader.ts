@@ -3,24 +3,24 @@ declare global {
         AddResolution: (Resolution: string, Extension: string, Size: number, ID: string) => void
         AddAudio: (Bitrate: number, Extension: string, Size: number, ID: string) => void
         
-        ffmpegbridge: any
+        FFMpegBridge: any
         spawn_worker: () => any
-        set_audio: (boolean: boolean) => any
+        SetIsAudio: (boolean: boolean) => any
         Sandbox: (code: string) => any
         request_proxied_fetch: (data: any) => Promise<ProxyResult>
     }
 }
 
-import { ProxyFetch, response, spawn_worker } from '@/proxy/HttpWorker'
-import { DynamicPromise as promise_init } from '@/downloader/utility/Promise'
-import { GetPyodide, StandardHandler } from '@/downloader/helper/Pyodide'
-import { Config, ffmpegbridge, PatchWorker } from '@/downloader/core/FFmpeg'
-import PythonScript from "./Download.py?raw"
+import { ProxyFetch, Response, SpawnWorker } from 'src/proxy/HttpWorker'
+import { DynamicPromise as promise_init } from 'src/downloader/utility/Promise'
+import { GetPyodide, StandardHandler } from 'src/downloader/helper/Pyodide'
+import { Config, Bridge, PatchWorker } from 'src/downloader/core/FFmpeg'
+import PythonScript from "src/downloader/core/Download.py?raw"
 
 import type { PyodideInterface } from 'pyodide'
-import { Debugger } from '@/downloader/helper/Debug'
-import { GetAssets } from '@/downloader/utility/Assets'
-import { General, Messages } from '@/Config'
+import { Debugger } from 'src/downloader/helper/Debug'
+import { GetAssets } from 'src/downloader/utility/Assets'
+import { General, Messages } from 'src/Config'
 import axios from 'axios'
 
 const Debug = new Debugger("Worker")
@@ -49,7 +49,7 @@ const Receive = (event: MessageEvent<any>) => {
             Download.Resolve(message.dlurl)
             break
         case Messages.ProxyResult:
-            response?.Resolve(Runtime?.toPy(message.response))
+            Response?.Resolve(Runtime?.toPy(message.response))
             break
         case Messages.SandboxResult:
             Evaluation.Resolve(message.result)
@@ -76,7 +76,7 @@ async function MainWorker() {
         pyodide.FS.mkdirTree("/usr/lib")
         Debug.Log("Loading cryptography libraries...")
         await Promise.all(["libcrypto.so", "libssl.so"].map(async f => pyodide.FS.writeFile(`/usr/lib/${f}`, new Uint8Array(await (await fetch(GetAssets(`/libs/pyodide/openssl-1.1.1w/${f}`))).arrayBuffer()))))
-        await pyodide.loadPackage(GetAssets(`/libs/pyodide/ssl-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl`))
+        await pyodide.loadPackage(GetAssets(`/libs/pyodide/ssl-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl`), { messageCallback: () => {} })
     }
 
     const PatchHTTP = async () => {
@@ -85,7 +85,7 @@ async function MainWorker() {
         await Promise.all(["__init__.py", "_core.py", "_requests.py", "_streaming.py", "_urllib.py"].map(async f => pyodide.FS.writeFile(`/lib/python3.12/site-packages/pyodide_http_fork/${f}`, await (await fetch(GetAssets(`/libs/pyodide_http_fork/pyodide_http/${f}`))).text())))
     }
 
-    await Promise.all([ PatchSSL(), PatchHTTP(), pyodide.loadPackage(await Promise.all([ GetWheel('yt-dlp'), GetWheel('yt-dlp-ytse') ])) ])
+    await Promise.all([ PatchSSL(), PatchHTTP(), pyodide.loadPackage(await Promise.all([ GetWheel('yt-dlp'), GetWheel('yt-dlp-ytse') ]), { messageCallback: () => {} }) ])
     Debug.Log("Fully initialized python runtime")
 
     pyodide.globals.set("url", await Download.Promise)
@@ -121,9 +121,9 @@ onmessage = event => {
         Debug.SetLoggingPort(Request)
         Debug.Log("Intiailizing download worker...")
         
-        self.spawn_worker = spawn_worker
-        self.ffmpegbridge = ffmpegbridge
-        self.set_audio = (b) => { Config.DisableUnlink = b }
+        self.spawn_worker = SpawnWorker
+        self.FFMpegBridge = Bridge
+        self.SetIsAudio = (b) => { Config.DisableUnlink = b }
 
         self.Sandbox = async (code) => {
             Evaluation = promise_init()

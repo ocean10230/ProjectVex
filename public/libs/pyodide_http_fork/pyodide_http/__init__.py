@@ -10,9 +10,7 @@ except ImportError:
 from contextlib import ContextDecorator
 from dataclasses import dataclass
 
-
-__version__ = "0.2.3"
-
+__version__ = "1.0.0"
 
 @dataclass
 class Options:
@@ -76,7 +74,7 @@ def should_patch():
     return _SHOULD_PATCH
 
 def patch_ssl():
-    # patch, no idea what it does honestly
+    
     ssl._create_default_https_context = ssl._create_unverified_context
 
 def patch_all():

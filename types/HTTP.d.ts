@@ -14,33 +14,30 @@ declare interface ProxyResult {
     body: any
 }
 
-declare interface OpenMessage {
-    url: string
-    fetchParams?: RequestInit
-    buffer: SharedArrayBuffer
-    close?: never
-    getMore?: never
-}
-
-declare interface GetMoreMessage {
-    getMore: number
-    close?: never
-}
-
-declare interface CloseMessage {
-    close: number
-    getMore?: never
-}
-
-type WorkerRequestMessage = OpenMessage | GetMoreMessage | CloseMessage
-
-declare interface ConnectionState {
-    reader: ReadableStreamDefaultReader<Uint8Array> | null
-    controller: AbortController
-    int: Int32Array
-    bytes: Uint8Array
+interface Connection {
+    reader: ReadableStreamDefaultReader<Uint8Array>
+    intBuffer: Int32Array
+    byteBuffer: Uint8Array
     value: Uint8Array | undefined
     curOffset: number
     nextRead: Promise<ReadableStreamReadResult<Uint8Array>> | null
     done: boolean
 }
+
+interface CloseMessage {
+    close: number
+}
+
+interface GetMoreMessage {
+    getMore: number
+}
+
+interface FetchMessage {
+    close?: undefined
+    getMore?: undefined
+    buffer: SharedArrayBuffer
+    url: string
+    fetchParams?: RequestInit
+}
+
+type WorkerMessage = CloseMessage | GetMoreMessage | FetchMessage

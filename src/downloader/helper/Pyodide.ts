@@ -1,5 +1,5 @@
 import { loadPyodide, type PyodideInterface } from "pyodide"
-import { Debugger } from "@/downloader/helper/Debug"
+import { Debugger } from "src/downloader/helper/Debug"
 
 var cached: null | PyodideInterface = null
 

@@ -1,7 +1,7 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg"
-import { GetPyodide } from "@/downloader/helper/Pyodide"
-import { General } from '@/Config'
-import { GetAssets } from "@/downloader/utility/Assets"
+import { GetPyodide } from "src/downloader/helper/Pyodide"
+import { General } from 'src/Config'
+import { GetAssets } from "src/downloader/utility/Assets"
 
 let loaded = false
 export let ffmpeg: FFmpeg | undefined
@@ -73,10 +73,10 @@ const LoadFFMpeg = async () => {
 
     loaded = true
     General.ShowLogs.FFMpeg && console.log("[ffmpeg] loaded")
-    return ffmpegbridge
+    return Bridge
 }
 
-export async function ffmpegbridge(mode: "ffmpeg" | "ffprobe", args: any[], joint_out: boolean) {
+export async function Bridge(mode: "ffmpeg" | "ffprobe", args: any[], joint_out: boolean) {
     try {
         if (!loaded) await LoadFFMpeg()
 

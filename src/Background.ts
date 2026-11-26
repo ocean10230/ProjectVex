@@ -1,2 +1,2 @@
-import "@/functions/ui.init"
-import "@/functions/chrome.init"
+import "src/functions/ui.init"
+import "src/functions/chrome.init"

@@ -68,7 +68,7 @@ class _ReadStream(io.RawIOBase):
         if not self.int_buffer:
             return 0
         if self.read_len == 0:
-            # wait for the worker to send something
+            
             js.Atomics.store(self.int_buffer, 0, 0)
             self.worker.postMessage(_obj_from_dict({"getMore": self.connection_id}))
             if js.Atomics.wait(self.int_buffer, 0, 0, self.timeout) == "timed-out":
@@ -84,13 +84,13 @@ class _ReadStream(io.RawIOBase):
 
                 raise _StreamingError
             else:
-                # EOF, free the buffers and return zero
+                
                 self.read_len = 0
                 self.read_pos = 0
                 self.int_buffer = None
                 self.byte_buffer = None
                 return 0
-        # copy from int32array to python bytes
+        
         ret_length = min(self.read_len, len(byte_obj))
         self.byte_buffer.subarray(self.read_pos, self.read_pos + ret_length).assign_to(
             byte_obj[0:ret_length]
@@ -112,8 +112,8 @@ def run_sync_wrapper(func):
 
 class _StreamingFetcher:
     def __init__(self):
-        # modified from pyodide_http's own code, its safer to spawn in js.
-        # i think lifetimes get fucked up if its spawned in python
+        
+        
 
         self._worker = run_sync_wrapper(js.spawn_worker())
 
@@ -123,9 +123,9 @@ class _StreamingFetcher:
         headers = request.headers
         body = request.body
         fetch_data = {"headers": headers, "body": to_js(body), "method": request.method,
-                      # send credentials if desired
+                      
                       "credentials": "include" if credentials else "omit"}
-        # start the request off in the worker
+        
         timeout = int(1000 * request.timeout) if request.timeout > 0 else None
         shared_buffer = js.SharedArrayBuffer.new(1048576)
         int_buffer = js.Int32Array.new(shared_buffer)
@@ -134,15 +134,7 @@ class _StreamingFetcher:
         js.Atomics.store(int_buffer, 0, 0)
         js.Atomics.notify(int_buffer, 0)
         absolute_url = js.URL.new(request.url, js.location).href
-        # js.console.log(
-        #     _obj_from_dict(
-        #         {
-        #             "buffer": shared_buffer,
-        #             "url": absolute_url,
-        #             "fetchParams": fetch_data,
-        #         }
-        #     )
-        # )
+      
         self._worker.postMessage(
             _obj_from_dict(
                 {
@@ -153,8 +145,8 @@ class _StreamingFetcher:
             ),
         )
 
-        # print(self._worker)
-        # wait for the worker to send something
+        
+        
         js.Atomics.wait(int_buffer, 0, 0, timeout)
         if int_buffer[0] == 0:
             from ._core import _StreamingTimeout
@@ -165,15 +157,15 @@ class _StreamingFetcher:
                 response=None,
             )
         if int_buffer[0] == SUCCESS_HEADER:
-            # got response
-            # header length is in second int of intBuffer
+            
+            
             string_len = int_buffer[1]
-            # decode the rest to a JSON string
+            
             decoder = js.TextDecoder.new()
-            # this does a copy (the slice) because decode can't work on shared array
-            # for some silly reason
+            
+            
             json_str = decoder.decode(byte_buffer.slice(0, string_len))
-            # get it as an object
+            
             response_obj = json.loads(json_str)
             return Response(
                 status_code=response_obj["status"],
@@ -192,7 +184,7 @@ class _StreamingFetcher:
             )
         if int_buffer[0] == ERROR_EXCEPTION:
             string_len = int_buffer[1]
-            # decode the error string
+            
             decoder = js.TextDecoder.new()
             json_str = decoder.decode(byte_buffer.slice(0, string_len))
             from ._core import _StreamingError
@@ -210,7 +202,7 @@ else:
 
 
 def send_streaming_request(request: Request, credentials: bool):
-    # global _fetcher
+    
     if _fetcher is None:
         return False
     return _fetcher.send(request, credentials)

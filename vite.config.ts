@@ -3,7 +3,6 @@ import preact from '@preact/preset-vite'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
-
 export default defineConfig({
   plugins: [ preact(), tailwindcss() ],
   build: {
@@ -16,6 +15,8 @@ export default defineConfig({
         script: "src/Background.ts",
         worker: "src/downloader/core/Downloader.ts",
         ui: "src/Render.tsx",
+
+        http_stream: "src/proxy/Streaming.ts"
       },
 
       output: {
@@ -41,11 +42,15 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      "components": path.resolve(__dirname, 'src', 'app', 'components'),
-      "functions": path.resolve(__dirname, 'src', 'app', 'functions'),
-      "hooks": path.resolve(__dirname, 'src', 'app', 'manager'),
-      "pages": path.resolve(__dirname, 'src', 'app', 'pages')
+      'src': path.resolve(__dirname, 'src'),
+
+      "frontend": path.resolve(__dirname, 'frontend'),
+      "components": path.resolve(__dirname, 'frontend', 'components'),
+      "functions": path.resolve(__dirname, 'frontend', 'functions'),
+      "hooks": path.resolve(__dirname, 'frontend', 'manager'),
+      "pages": path.resolve(__dirname, 'frontend', 'pages'),
+      "validation": path.resolve(__dirname, 'frontend', 'validation'),
+      "motion": path.resolve(__dirname, 'frontend', 'motion')
     }
   }
 })

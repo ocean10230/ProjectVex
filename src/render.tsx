@@ -1,6 +1,3 @@
-import 'preact/debug'
-import 'preact/devtools'
-
 import { render } from 'preact'
 import { X } from 'lucide-react'
 
@@ -8,11 +5,11 @@ import { VideoData } from 'hooks/utilities/VideoData'
 import { DebugContext } from 'hooks/utilities/Debugs'
 import ThemeContext from 'hooks/themes/Display'
 
-import { App } from '@/app/App'
+import { App } from 'frontend/App'
 import Notify from 'components/Notify'
 
-import { General, Messages } from '@/Config'
-import '@/app/index.css'
+import { General, Messages } from 'src/Config'
+import 'frontend/style.css'
 
 
 render(<App />, document.getElementById('app')!)

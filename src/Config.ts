@@ -5,6 +5,7 @@ export const General = {
         FFMpeg: false,
         Messages: false,
         Frontend: false,
+        Proxies: false,
         
         "YT-DLP_Download": false
     }
@@ -39,6 +40,5 @@ export const UIConfig = {
 }
 
 export const APIConfig = {
-    API_KEY: "AIzaSyCp7wiyDh6BxA5z9-UQHFD9uPDt9ClsiXw",
     REQUEST_TIMEOUT_MS: 10000
 }

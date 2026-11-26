@@ -1,6 +1,6 @@
-import { Sandbox } from "@/downloader/sandbox/Evaluate"
-import { Fetch } from "@/proxy/HttpProxy"
-import { General, Messages, UIConfig } from '@/Config'
+import { Sandbox } from "src/downloader/sandbox/Evaluate"
+import { Fetch } from "src/proxy/HttpProxy"
+import { General, Messages, UIConfig } from 'src/Config'
 
 const { Inset, Width, Height } = UIConfig
 
@@ -68,7 +68,7 @@ const start = async () => {
         height: `${Height}px`,
         zIndex: "99999",
         willChange: "transform",
-        transition: "transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+        transition: "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
     })
 
     tweenContainerPosition(container, currentPosition, true)

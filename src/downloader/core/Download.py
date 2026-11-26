@@ -12,9 +12,9 @@ from pyodide.ffi import run_sync, to_js
 from yt_dlp.utils import _utils
 from yt_dlp.postprocessor import ffmpeg
 from yt_dlp import downloader
-from js import ffmpegbridge, Object, Sandbox, AddResolution, AddAudio, set_audio
+from js import FFMpegBridge, Object, Sandbox, AddResolution, AddAudio, SetIsAudio
 
-def run_sync_wrapper(func):
+def RunSync(func):
     try:
         return run_sync(func)
     except RuntimeError as e:
@@ -31,30 +31,29 @@ if importlib.util.find_spec("yt_dlp.extractor.youtube.jsc"):
     from yt_dlp.extractor.youtube.jsc._builtin.deno import DenoJCP
 
     @register_provider
-    class dlProJCP(DenoJCP):
-        PROVIDER_NAME = 'dlPro'
-        JS_RUNTIME_NAME = 'dlPro'
+    class VexJCP(DenoJCP):
+        PROVIDER_NAME = 'ProjectVex'
+        JS_RUNTIME_NAME = 'VexSandox'
 
         def is_available(self, /) -> bool:
             return True
 
         def _run_deno(self, stdin, options) -> str:
-            print("Requesting JS challenge handler...", file=sys.stderr)
-            res = run_sync_wrapper(Sandbox(stdin))
-            print("Got challenge result", file=sys.stderr)
+            print("Requesting JS challenge handler...")
+            res = RunSync(Sandbox(stdin))
             return res
 
         def _npm_packages_cached(self, stdin: str) -> bool:
             return False
 
-    @register_preference(dlProJCP)
+    @register_preference(VexJCP)
     def preference(*_) -> int:
         return 99999999999999999
 
 def popen_run(cls, args, **kwargs):
     if args[0] in ["ffmpeg", "ffprobe"]:
-        return run_sync_wrapper(
-            ffmpegbridge(
+        return RunSync(
+            FFMpegBridge(
                 args[0],
                 to_js(args[1:], dict_converter=Object.fromEntries),
                 kwargs.get("stderr", -1) == -2 
@@ -130,7 +129,7 @@ with YoutubeDL(ydl_opts) as ydl:
         info.pop(stale_key, None)
 
     if is_audio:
-        set_audio(True)
+        SetIsAudio(True)
         print("downloading audio")
         ydl.params["keepvideo"] = True
     
