@@ -76,7 +76,7 @@ async function MainWorker() {
         pyodide.FS.mkdirTree("/usr/lib")
         Debug.Log("Loading cryptography libraries...")
         await Promise.all(["libcrypto.so", "libssl.so"].map(async f => pyodide.FS.writeFile(`/usr/lib/${f}`, new Uint8Array(await (await fetch(GetAssets(`/libs/pyodide/openssl-1.1.1w/${f}`))).arrayBuffer()))))
-        await pyodide.loadPackage(GetAssets(`/libs/pyodide/ssl-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl`), { messageCallback: () => {} })
+        await pyodide.loadPackage(GetAssets(`/libs/pyodide/ssl-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl`))
     }
 
     const PatchHTTP = async () => {
@@ -85,7 +85,7 @@ async function MainWorker() {
         await Promise.all(["__init__.py", "_core.py", "_requests.py", "_streaming.py", "_urllib.py"].map(async f => pyodide.FS.writeFile(`/lib/python3.12/site-packages/pyodide_http_fork/${f}`, await (await fetch(GetAssets(`/libs/pyodide_http_fork/pyodide_http/${f}`))).text())))
     }
 
-    await Promise.all([ PatchSSL(), PatchHTTP(), pyodide.loadPackage(await Promise.all([ GetWheel('yt-dlp'), GetWheel('yt-dlp-ytse') ]), { messageCallback: () => {} }) ])
+    await Promise.all([ PatchSSL(), PatchHTTP(), pyodide.loadPackage(await Promise.all([ GetWheel('yt-dlp'), GetWheel('yt-dlp-ytse') ])) ])
     Debug.Log("Fully initialized python runtime")
 
     pyodide.globals.set("url", await Download.Promise)
